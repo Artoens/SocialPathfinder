@@ -114,4 +114,8 @@ class Joueur
 
         return $this;
     }
+    public function __toString()
+    {
+        return 'any string';
+    }
 }

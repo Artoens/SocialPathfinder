@@ -11,12 +11,28 @@
 <div class="example-wrapper">
     <h1>Welcome to SocialTableTop !</h1>
 
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/FullDisplayController.php'|file_link(0) }}">src/Controller/FullDisplayController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/full_display/index.html.twig'|file_link(0) }}">templates/full_display/index.html.twig</a></code></li>
-    </ul>
 
 
+{% for joueur in joueurs %}
+<div>
+    {{joueur.name}}
+</div>
+{% endfor %}
+{% for per in pers %}
+<div>
+    {{per.joueur.name}}
+    {{per.name}}
+    {{per.TableDeJeux.Name}}
+</div>
+{% endfor %}
 
+{#
+{% for table in tables %}
+<div>
+    {{table.Name}}</br>
+    {{table.Mj}}
+</div>
+{% endfor %}
+#}
 </div>
 {% endblock %}

@@ -63,6 +63,7 @@ class Personnage
 
     public function getTableDeJeux(): ?Table
     {
+        var_dump($this->TableDeJeux->GetName());
         return $this->TableDeJeux;
     }
 

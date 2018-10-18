@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class TableType extends AbstractType
 {
@@ -19,12 +20,23 @@ class TableType extends AbstractType
             ->add('name', TextType::class, array('label' => 'Nom'))
             ->add('Mj', TextType::class, array('label' => 'MJ'))
             ->add('Description', TextType::class, array('label' => 'Description'))
-            ->add('joueurs', EntityType::class, array(
-                'label' => 'Joueur',
+            ->add('Joueurs', EntityType::class, array(
+                'label' => 'Joueurs',
                 'class' => Joueur::class,
-                'choice_label' => 'name'))
+                'choice_label' => 'name',
+                'expanded'=>false,
+                'multiple'=>true))
+            /*
+                ->add('Joueurs', CollectionType::class, array(
+                    // each entry in the array will be an "email" field
+                    'entry_type' => Joueur::class,
+                    // these options are passed to each "email" type
+                    'entry_options' => array(
+                        'attr' => array('class' => 'Joueur')
+                        )))
+                */
             ->add('save', SubmitType::class, array('label' => 'Sauvegarder'))
-            ->getForm();
+            ->getForm(); 
         ;
     }
 

@@ -28,10 +28,10 @@ class TableController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) 
         {
-            #$em = $this->getDoctrine()->getManager();
-            #$em->persist($joueur);
-            #$em->flush();
-            return new Response('Le Personnage est ajoutée avec succès !'); 
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($table);
+            $em->flush();
+            return new Response('La table est ajoutée avec succès !'); 
         }
 
         return $this->render('table/new.html.twig', array('form' =>$form->createView())); 

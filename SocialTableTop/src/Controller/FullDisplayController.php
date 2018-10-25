@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Joueur;
 use App\Entity\Personnage;
-use App\Entity\Table;
+use App\Entity\MyTable;
 
 class FullDisplayController extends AbstractController
 {
@@ -18,21 +18,20 @@ class FullDisplayController extends AbstractController
 
         $joueurs = $this->getDoctrine()
                     ->getRepository(Joueur::class)
-                    ->findAll();
+                    ->findAll(); 
         
         $pers = $this->getDoctrine()
                     ->getRepository(Personnage::class)
-                    ->find(1);
-        echo $pers->getTableDeJeux()->GetName();
-        // $tables = $this->getDoctrine()
-        //     ->getRepository(Table::class)
-        //     ->findAll();
+                    ->findall();
+        $tables = $this->getDoctrine()
+             ->getRepository(MyTable::class)
+             ->findAll();
 
         
         return $this->render('full_display/index.html.twig', [
             'joueurs' => $joueurs,
             'pers' => $pers,
-            // 'tables' => $tables
+            'tables' => $tables
         ]);
     }
 }

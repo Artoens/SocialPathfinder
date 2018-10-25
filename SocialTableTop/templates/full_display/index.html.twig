@@ -13,26 +13,33 @@
 
 
 
+<a href="{{ path('newjoueur')}}"> new player <a>
 {% for joueur in joueurs %}
 <div>
+<a href="{{ path('joueur', {'id': joueur.id }) }}">
     {{joueur.name}}
+</a>
 </div>
 {% endfor %}
+<a href="{{ path('newpersonnage')}}"> new perso <a>
 {% for per in pers %}
 <div>
-    {{per.joueur.name}}
-    {{per.name}}
+<a href="{{ path('personnage', {'id': per.id }) }}">
+    {{per.name}}</br>
+</a>
+    {{per.joueur.name}}</br>
     {{per.TableDeJeux.Name}}
 </div>
 {% endfor %}
-
-{#
+<a href="{{ path('newtable')}}"> new table <a>
 {% for table in tables %}
 <div>
+<a href="{{ path('mytable', {'id': table.id }) }}">
     {{table.Name}}</br>
+</a>
     {{table.Mj}}
 </div>
+
 {% endfor %}
-#}
 </div>
 {% endblock %}

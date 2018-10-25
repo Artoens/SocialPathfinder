@@ -16,4 +16,5 @@ class PersonnageController extends AbstractController
             'controller_name' => 'PersonnageController',
         ]);
     }
+    
 }

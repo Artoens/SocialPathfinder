@@ -28,7 +28,7 @@ class Personnage
     private $joueur;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Table", inversedBy="Personnages")
+     * @ORM\ManyToOne(targetEntity="App\Entity\MyTable", inversedBy="Personnages")
      */
     private $TableDeJeux;
 
@@ -61,13 +61,13 @@ class Personnage
         return $this;
     }
 
-    public function getTableDeJeux(): ?Table
+    public function getTableDeJeux(): ?MyTable
     {
         var_dump($this->TableDeJeux->GetName());
         return $this->TableDeJeux;
     }
 
-    public function setTableDeJeux(?Table $TableDeJeux): self
+    public function setTableDeJeux(?MyTable $TableDeJeux): self
     {
         $this->TableDeJeux = $TableDeJeux;
 

@@ -29,7 +29,7 @@ class Joueur
     private $Personnage;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Table", mappedBy="joueurs")
+     * @ORM\ManyToMany(targetEntity="App\Entity\MyTable", mappedBy="joueurs")
      */
     private $Tables;
 
@@ -88,14 +88,14 @@ class Joueur
     }
 
     /**
-     * @return Collection|Table[]
+     * @return Collection|MyTable[]
      */
     public function getTables(): Collection
     {
         return $this->Tables;
     }
 
-    public function addTable(Table $table): self
+    public function addTable(MyTable $table): self
     {
         if (!$this->Tables->contains($table)) {
             $this->Tables[] = $table;
@@ -105,7 +105,7 @@ class Joueur
         return $this;
     }
 
-    public function removeTable(Table $table): self
+    public function removeTable(MyTable $table): self
     {
         if ($this->Tables->contains($table)) {
             $this->Tables->removeElement($table);

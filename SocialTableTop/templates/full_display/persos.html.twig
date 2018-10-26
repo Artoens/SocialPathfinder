@@ -1,0 +1,32 @@
+    {% extends 'base.html.twig' %}
+    {% block body %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link " data-toggle="tab" href="/players">Joueurs</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="/tables">Tables</a>
+        </li> 
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="/persos">Personnages</a>
+        </li> 
+    </ul>
+    <div style="padding:30px" >
+        <a class="btn btn-success" href="{{ path('newpersonnage')}}"> Nouveau Personnage </a>
+        <hr>
+        {% for per in pers %}
+        <div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
+            <div class="card-header">{{per.Name}}</div>            
+            <a class="btn btn-outline-warning" href="{{ path('updatepersonnage', {'id': per.id }) }}">Changer</a>  
+            <a class="btn btn-outline-danger" href="{{ path('deletepersonnage', {'id': per.id }) }}">Supprimé</a>
+            <div class="card-body">
+                <h4 class="card-title"> {{per.name}} </h4>
+                <p> Joueur : {{per.getJoueur().name}} <br>
+                    Table : {{per.getTableDeJeux().name}} </p>
+            </div>
+        </div>
+        {% endfor %}
+    <div>
+    {% endblock %}
+    {% block javascripts %}{% endblock %}
+    

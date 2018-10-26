@@ -31,37 +31,12 @@ class MyTableController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($table);
             $em->flush();
-            return new Response('La table est ajoutée avec succès !'); 
+            $this->addFlash('notice', 'Table créé!');
+            return $this->redirect($this->generateUrl('tables'));  
         }
 
         return $this->render('my_table/new.html.twig', array('form' =>$form->createView())); 
     }
-    /**
-     * @Route("/mytable", name="mytable")
-     */
-    public function index()
-    {
-        return $this->render('my_table/index.html.twig', [
-            'controller_name' => 'MyTableController',
-        ]);
-    }
-
-    /**
-     * @Route("/mytable/{id}", name="mytable")
-     */
-    public function viewTable($id)
-    {
-        $table = $this->getDoctrine()
-                    ->getRepository(MyTable::class)
-                    ->find($id);
-
-
-        return $this->render('my_table/view.html.twig', [
-            'controller_name' => 'PersonnageController',
-            'table' => $table,
-        ]);
-    }
-
     
     /**
      * @Route("/updatemytable/{id}", name="updatemytable")
@@ -83,7 +58,8 @@ class MyTableController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($table);
             $em->flush();
-            return new Response('La table est changé avec succès !'); 
+            $this->addFlash('notice', 'Table mise à jour!');
+            return $this->redirect($this->generateUrl('tables'));  
         }
 
         return $this->render('my_table/new.html.twig', array('form' =>$form->createView())); 
@@ -100,7 +76,7 @@ class MyTableController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->remove($table);
         $em->flush();
-
-        return $this->redirect($this->generateUrl('full_display'));
+        $this->addFlash('notice', 'Table supprimée!');
+        return $this->redirect($this->generateUrl('tables'));
     }
 }

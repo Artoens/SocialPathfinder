@@ -29,44 +29,13 @@ class JoueurController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($joueur);
             $em->flush();
-            return new Response('Le Personnage est ajoutée avec succès !'); 
+            $this->addFlash('notice', 'Joueur créé!');
+            return $this->redirect($this->generateUrl('full_display')); 
         }
 
         return $this->render('joueur/new.html.twig', array('form' =>$form->createView())); 
-    }
-    
-    /**
-     * @Route("/joueur", name="joueur")
-     */
-    public function index()
-    {
-        $joueurs = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
-                    ->findAll();
-
-        return $this->render('joueur/index.html.twig', [
-            'controller_name' => 'JoueurController',
-            'joueurs' => $joueurs
-        ]);
-    }
-
-    /**
-     * @Route("/joueur/{id}", name="joueur")
-     */
-    public function viewjoeur($id)
-    {
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
-                    ->find($id);
-
-
-        return $this->render('joueur/view.html.twig', [
-            'controller_name' => 'PersonnageController',
-            'joueur' => $joueur,
-        ]);
-    }
-
-    
+    }    
+     
     /**
      * @Route("/updatejoueur/{id}", name="updatejoueur")
      */
@@ -87,10 +56,11 @@ class JoueurController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($joueur);
             $em->flush();
-            return new Response('Le joueur est changé avec succès !'); 
+            $this->addFlash('notice', 'Joueur Mis à jour!');
+            return $this->redirect($this->generateUrl('full_display'));  
         }
 
-        return $this->render('personnage/new.html.twig', array('form' =>$form->createView())); 
+        return $this->render('joueur/new.html.twig', array('form' =>$form->createView()));
     }
 
     /**
@@ -104,7 +74,7 @@ class JoueurController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->remove($joueur);
         $em->flush();
-
+        $this->addFlash('notice', 'Joueur supprimée!');
         return $this->redirect($this->generateUrl('full_display'));
     }
 } 

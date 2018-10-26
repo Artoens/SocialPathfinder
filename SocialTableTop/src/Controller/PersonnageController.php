@@ -30,34 +30,11 @@ class PersonnageController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($perso);
             $em->flush();
-            return new Response('Le Personnage est ajoutée avec succès !'); 
+            $this->addFlash('notice', 'Personnage créé!');
+            return $this->redirect($this->generateUrl('persos'));
         }
 
         return $this->render('personnage/new.html.twig', array('form' =>$form->createView())); 
-    }
-    /**
-     * @Route("/personnage", name="personnage")
-     */
-    public function index()
-    {
-        return $this->render('personnage/index.html.twig', [
-            'controller_name' => 'PersonnageController',
-        ]);
-    }
-    /**
-     * @Route("/personnage/{id}", name="personnage")
-     */
-    public function viewPerso($id)
-    {
-        $per = $this->getDoctrine()
-                    ->getRepository(Personnage::class)
-                    ->find($id);
-
-
-        return $this->render('personnage/view.html.twig', [
-            'controller_name' => 'PersonnageController',
-            'per' => $per,
-        ]);
     }
 
     /**
@@ -80,7 +57,8 @@ class PersonnageController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($per);
             $em->flush();
-            return new Response('Le Personnage est changé avec succès !'); 
+            $this->addFlash('notice', 'Personnage mis à jour!');
+            return $this->redirect($this->generateUrl('persos'));
         }
 
         return $this->render('personnage/new.html.twig', array('form' =>$form->createView())); 
@@ -97,7 +75,7 @@ class PersonnageController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->remove($per);
         $em->flush();
-
-        return $this->redirect($this->generateUrl('full_display'));
+        $this->addFlash('notice', 'Personnage supprimée!');
+        return $this->redirect($this->generateUrl('persos'));
     }
 } 

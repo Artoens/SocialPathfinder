@@ -1,0 +1,42 @@
+   {% extends 'base.html.twig' %}
+    {% block body %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link " data-toggle="tab" href="/players">Joueurs</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="/tables">Tables</a>
+        </li> 
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="/persos">Personnages</a>
+        </li> 
+    </ul>
+    <div style="padding:30px" >
+        <a class="btn btn-success" href="{{ path('newtable')}}"> Nouvelle table </a>
+        <hr>
+        {% for table in tables %}
+        <div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
+            <div class="card-header">{{table.Name}}</div>
+            <a class="btn btn-outline-warning" href="{{ path('updatemytable', {'id': table.id }) }}">Changer</a>  
+            <a class="btn btn-outline-danger" href="{{ path('deletemytable', {'id': table.id }) }}">Supprimé</a>
+            <div class="card-body">
+                <h4 class="card-title"> {{table.name}} </h4>
+                <p> Maître du jeu: {{table.MJ}}</p>
+                <ul>
+                    {% for perso in table.getPersonnages() %}
+                    <li class="card-text"> {{perso.getName()}}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for joueur in table.getJoueurs() %}
+                    <li class="card-text"> {{joueur.getName()}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    <div>
+    {% endblock %}
+    {% block javascripts %}{% endblock %}

@@ -1,5 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %} Nouveau Joueur {% endblock %}
 {% block body %}
-<div>
-{{ form(form) }}
+<div style="padding:30px" >
+    <p> Entrez le nom du joueur que vous voulez créer, allez ensuite mettre à jouer les tables et personnages (s'ils sont déjà créés)</p>
+    <div class="form-group">
+    {{ form(form) }}
+    </div>
 </div>
 {% endblock %}

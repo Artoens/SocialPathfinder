@@ -16,7 +16,9 @@
         <hr>
         {% for per in pers %}
         <div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
-            <div class="card-header">{{per.Name}}</div>            
+            <div class="card-header">{{per.Name}}
+                <a type="button" class="btn btn-link btn-sm" href="{{ path('personnage', {'id': per.id }) }}">Extend</a>
+            </div>            
             <a class="btn btn-outline-warning" href="{{ path('updatepersonnage', {'id': per.id }) }}">Changer</a>  
             <a class="btn btn-outline-danger" href="{{ path('deletepersonnage', {'id': per.id }) }}">Supprimé</a>
             <div class="card-body">

@@ -14,6 +14,20 @@ use Symfony\Component\HttpFoundation\Response;
 class MyTableController extends AbstractController
 {
     /**
+     * @Route("/table/{id}", name="table")
+     */
+    public function Mytable(Request $request, $id)
+    {
+        $table = $this->getDoctrine()
+                    ->getRepository(Mytable::class)
+                    ->find($id);
+
+        return $this->render('my_table/index.html.twig', [
+            'table' => $table,
+        ]);
+    }
+    
+    /**
      * @Route("/newtable", name="newtable")
      */
     public function savetable(Request $request)

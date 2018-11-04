@@ -1,20 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/MyTableController.php'|file_link(0) }}">src/Controller/MyTableController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/my_table/index.html.twig'|file_link(0) }}">templates/my_table/index.html.twig</a></code></li>
-    </ul>
-</div>
+<div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
+            <div class="card-header">{{table.Name}}
+            </div>
+            <a class="btn btn-outline-warning" href="{{ path('updatemytable', {'id': table.id }) }}">Changer</a>  
+            <a class="btn btn-outline-danger" href="{{ path('deletemytable', {'id': table.id }) }}">Supprimé</a>
+            <div class="card-body">
+                <h4 class="card-title"> {{table.name}} </h4>
+                <p> Maître du jeu: {{table.MJ}}</p>
+                <ul>
+                    {% for perso in table.getPersonnages() %}
+                    <li class="card-text"> {{perso.getName()}}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for joueur in table.getJoueurs() %}
+                    <li class="card-text"> {{joueur.getName()}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 {% endblock %}

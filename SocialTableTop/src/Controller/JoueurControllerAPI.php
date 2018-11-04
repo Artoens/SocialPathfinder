@@ -8,23 +8,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
-class JoueurController extends AbstractController
+class JoueurControllerAPI extends AbstractController
 {
     /**
-     * @Route("/joueur/{id}", name="joueur")
+     * @Route("/API/joueur/{id}", name="joueurapi", methods={"GET"})
      */
-    public function joueur(Request $request, $id)
+    public function joueurApi(Request $request, $id)
     {
+
+        $encoders = array( new JsonEncoder());
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setCircularReferenceLimit(2);
+        // Add Circular reference handler
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            return $object->getId();
+        });
+        $normalizers = array($normalizer);
+        $serializer = new Serializer($normalizers, $encoders);
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
                     ->find($id);
-
-        return $this->render('joueur/index.html.twig', [
-            'joueur' => $joueur,
-        ]);
+        $jsonContent = $serializer->serialize($joueur,'json');
+        $response = new JsonResponse();
+        $response->setContent($jsonContent);
+        return $response;
     }
-
+    
     /**
      * @Route("/newjoueur", name="newjoueur")
      */
@@ -78,9 +92,9 @@ class JoueurController extends AbstractController
     }
 
     /**
-     * @Route("/deletejoueur/{id}", name="deletejoueur")
+     * @Route("/api/deletejoueur/{id}", name="apideletejoueur")
      */
-    public function deleteJoueur(Request $request, $id)
+    public function deleteJoueurAPI(Request $request, $id)
     {
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
@@ -88,7 +102,19 @@ class JoueurController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->remove($joueur);
         $em->flush();
-        $this->addFlash('notice', 'Joueur supprimée!');
-        return $this->redirect($this->generateUrl('full_display'));
+        $encoders = array( new JsonEncoder());
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setCircularReferenceLimit(2);
+        // Add Circular reference handler
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            return $object->getId();
+        });
+        $normalizers = array($normalizer);
+        $serializer = new Serializer($normalizers, $encoders);
+        $text = "deleted";
+        $jsonContent = $serializer->serialize($text,'json');
+        $response = new JsonResponse();
+        $response->setContent($jsonContent);
+        return $response;
     }
 } 

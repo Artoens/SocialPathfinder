@@ -16,7 +16,9 @@
     <hr>
     {% for joueur in joueurs %}
     <div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
-    <div class="card-header">{{joueur.Name}}</div>
+    <div class="card-header">{{joueur.Name}} 
+        <a type="button" class="btn btn-link btn-sm" href="{{ path('joueur', {'id': joueur.id }) }}">Extend</a>
+    </div>
     <a class="btn btn-outline-warning" href="{{ path('updatejoueur', {'id': joueur.id }) }}">Changer</a>  
     <a class="btn btn-outline-danger" href="{{ path('deletejoueur', {'id': joueur.id }) }}">Supprimé</a>
         <div class="card-body">

@@ -1,21 +1,27 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Hello {{ controller_name }}!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Welcome to SocialTableTop !</h1>
+<div class="card border-light mb-3" style="margin: auto; width: 33%; padding: 10px;">
+    <div class="card-header" href="{{ path('joueur', {'id': joueur.id }) }}" >{{joueur.Name}} </div>
+    <a class="btn btn-outline-warning" href="{{ path('updatejoueur', {'id': joueur.id }) }}">Changer</a>  
+    <a class="btn btn-outline-danger" href="{{ path('deletejoueur', {'id': joueur.id }) }}">Supprimé</a>
+        <div class="card-body">
+        <h4 class="card-title"> {{joueur.name}} </h4>
+        <h5> Tables:</h5>
+        <ul>
+        {% for table in joueur.getTables() %}
+        <li class="card-text"> {{table.getName()}}
+        </li>
+        {% endfor %}
+        </ul>
+        <h5> Personnages:</h5>
+        <ul>
+        {% for persos in joueur.getPersonnage() %}
+        <li class="card-text"> {{persos.getName()}}
+        </li>
+        {% endfor %}
+        </ul>
+        </div>
+    </div>
 
-
-
-{% for joueur in joueurs %}
-<div>
-    {{joueur.name}}
-</div>
-{% endfor %}
 {% endblock %}

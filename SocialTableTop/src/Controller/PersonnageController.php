@@ -13,6 +13,20 @@ use Symfony\Component\HttpFoundation\Response;
 class PersonnageController extends AbstractController
 {
     /**
+     * @Route("/presonnage/{id}", name="personnage")
+     */
+    public function personnage(Request $request, $id)
+    {
+        $personnage = $this->getDoctrine()
+                    ->getRepository(Personnage::class)
+                    ->find($id);
+
+        return $this->render('personnage/index.html.twig', [
+            'per' => $personnage,
+        ]);
+    }
+
+    /**
      * @Route("/newpersonnage", name="newpersonnage")
      */
     public function savePersonngage(Request $request)

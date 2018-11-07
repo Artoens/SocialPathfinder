@@ -40,59 +40,104 @@ class JoueurControllerAPI extends AbstractController
     }
     
     /**
-     * @Route("/newjoueur", name="newjoueur")
+     * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST"})
      */
-    public function saveJoueur(Request $request)
+    public function saveJoueurAPI(Request $request)
     {
+        $json = $request->getContent();
+        $content = json_decode($json, true);
         $joueur = new Joueur();
+        $response = new JsonResponse();
         
-        $form = $this->createForm(JoueurType::class, $joueur);
+        if (isset($content["name"])){
 
-        $form->handleRequest($request);
-
-        $joueur = $form->getData();
-
-        if ($form->isSubmitted() && $form->isValid()) 
-        {
+            $joueur->setName($content["name"]);
             $em = $this->getDoctrine()->getManager();
             $em->persist($joueur);
             $em->flush();
-            $this->addFlash('notice', 'Joueur créé!');
-            return $this->redirect($this->generateUrl('full_display')); 
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(2);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $text = "created";
+            $jsonContent = $serializer->serialize($text,'json');
+            $response->setContent($jsonContent);
         }
 
-        return $this->render('joueur/new.html.twig', array('form' =>$form->createView())); 
+        else{
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(2);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $text = "error YOU DUMASS";
+            $jsonContent = $serializer->serialize($text,'json');
+            $response->setContent($jsonContent);
+        }
+        return $response; 
     }    
+
      
     /**
-     * @Route("/updatejoueur/{id}", name="updatejoueur")
+     * @Route("/API/updatejoueur/{id}", name="updatejoueurAPI", methods={"PUT"})
      */
-    public function updatejoueur(Request $request, $id)
+    public function updatejoueurAPI(Request $request, $id)
     {
+        $json = $request->getContent();
+        $content = json_decode($json, true);
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
                     ->find($id);
+        $response = new JsonResponse();
         
-        $form = $this->createForm(JoueurType::class, $joueur);
+        if (isset($content["name"])){
 
-        $form->handleRequest($request);
-
-        $joueur = $form->getData();
-
-        if ($form->isSubmitted() && $form->isValid()) 
-        {
+            $joueur->setName($content["name"]);
             $em = $this->getDoctrine()->getManager();
             $em->persist($joueur);
             $em->flush();
-            $this->addFlash('notice', 'Joueur Mis à jour!');
-            return $this->redirect($this->generateUrl('full_display'));  
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(2);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $text = "updated";
+            $jsonContent = $serializer->serialize($text,'json');
+            $response->setContent($jsonContent);
         }
 
-        return $this->render('joueur/new.html.twig', array('form' =>$form->createView()));
+        else{
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(2);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $text = "error YOU DUMASS";
+            $jsonContent = $serializer->serialize($text,'json');
+            $response->setContent($jsonContent);
+        }
+        return $response; 
     }
 
     /**
-     * @Route("/api/deletejoueur/{id}", name="apideletejoueur")
+     * @Route("/api/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
      */
     public function deleteJoueurAPI(Request $request, $id)
     {

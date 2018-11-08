@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Controller;
-
-use App\Form\JoueurType;
+use App\Entity\Personnage;
 use App\Entity\Joueur;
+use App\Entity\MyTable;
+use App\Form\PersonnageType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,14 +14,13 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class JoueurControllerAPI extends AbstractController
+class PersonnageControllerAPI extends AbstractController
 {
     /**
-     * @Route("/API/joueur/{id}", name="joueurapi", methods={"GET"})
+     * @Route("/api/presonnage/{id}", name="personnageapi", methods={"GET"})
      */
-    public function joueurApi(Request $request, $id)
+    public function personnageAPI(Request $request, $id)
     {
-
         $encoders = array( new JsonEncoder());
         $normalizer = new ObjectNormalizer();
         $normalizer->setCircularReferenceLimit(1);
@@ -30,30 +30,38 @@ class JoueurControllerAPI extends AbstractController
         });
         $normalizers = array($normalizer);
         $serializer = new Serializer($normalizers, $encoders);
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
+        $personnage = $this->getDoctrine()
+                    ->getRepository(Personnage::class)
                     ->find($id);
-        $jsonContent = $serializer->serialize($joueur,'json');
+        $jsonContent = $serializer->serialize($personnage,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
         return $response;
     }
-    
+
     /**
-     * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST"})
+     * @Route("/api/newpersonnage", name="newpersonnageapi", methods={"POST"})
      */
-    public function saveJoueurAPI(Request $request)
+    public function savePersonngageAPI(Request $request)
     {
         $json = $request->getContent();
         $content = json_decode($json, true);
-        $joueur = new Joueur();
+        $perso = new Personnage();
         $response = new JsonResponse();
         
-        if (isset($content["name"])){
+        if (isset($content["name"]) && isset($content["idjoueur"])&& isset($content["idtable"])){
 
-            $joueur->setName($content["name"]);
+            $perso->setName($content["name"]);
+            $j = $this->getDoctrine()
+                ->getRepository(Joueur::class)
+                ->find($content["idjoueur"]);
+            $perso->setJoueur($j);
+            $t = $this->getDoctrine()
+                ->getRepository(MyTable::class)
+                ->find($content["idtable"]);
+            $perso->setTableDeJeux($t);
             $em = $this->getDoctrine()->getManager();
-            $em->persist($joueur);
+            $em->persist($perso);
             $em->flush();
             $encoders = array( new JsonEncoder());
             $normalizer = new ObjectNormalizer();
@@ -64,8 +72,7 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $text = "created";
-            $jsonContent = $serializer->serialize($joueur,'json');
+            $jsonContent = $serializer->serialize($perso,'json');
             $response->setContent($jsonContent);
         }
 
@@ -79,72 +86,84 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name";
+            $text = "error, you did not send the right json, json must have: name, idjoueur and idtable";
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }
-        return $response; 
-    }    
-
-     
-    /**
-     * @Route("/API/updatejoueur/{id}", name="updatejoueurAPI", methods={"PUT"})
-     */
-    public function updatejoueurAPI(Request $request, $id)
-    {
-        $json = $request->getContent();
-        $content = json_decode($json, true);
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
-                    ->find($id);
-        $response = new JsonResponse();
-        
-        if (isset($content["name"])){
-
-            $joueur->setName($content["name"]);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($joueur);
-            $em->flush();
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $jsonContent = $serializer->serialize($joueur,'json');
-            $response->setContent($jsonContent);
-        }
-
-        else{
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name";
-            $jsonContent = $serializer->serialize($text,'json');
-            $response->setContent($jsonContent);
-        }
-        return $response; 
+        return $response;
     }
 
     /**
-     * @Route("/api/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
+     * @Route("/api/updatepersonnage/{id}", name="updatepersonnageapi", methods={"PUT"})
      */
-    public function deleteJoueurAPI(Request $request, $id)
+    public function updatePersonngageAPI(Request $request, $id)
     {
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
+        $json = $request->getContent();
+        $content = json_decode($json, true);
+        $perso = $this->getDoctrine()
+                    ->getRepository(Personnage::class)
+                    ->find($id);
+        $response = new JsonResponse();
+        
+        if (isset($content["name"]) || isset($content["idjoueur"])|| isset($content["idtable"])){
+            if(isset($content["name"])){
+                $perso->setName($content["name"]);
+            }
+            if(isset($content["idjoueur"])){
+            $j = $this->getDoctrine()
+                ->getRepository(Joueur::class)
+                ->find($content["idjoueur"]);
+            $perso->setJoueur($j);
+            }
+            if(isset($content["idtable"])){
+            $t = $this->getDoctrine()
+                ->getRepository(MyTable::class)
+                ->find($content["idtable"]);
+            $perso->setTableDeJeux($t);
+            }
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($perso);
+            $em->flush();
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(1);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $jsonContent = $serializer->serialize($perso,'json');
+            $response->setContent($jsonContent);
+        }
+
+        else{
+            $encoders = array( new JsonEncoder());
+            $normalizer = new ObjectNormalizer();
+            $normalizer->setCircularReferenceLimit(1);
+            // Add Circular reference handler
+            $normalizer->setCircularReferenceHandler(function ($object) {
+                return $object->getId();
+            });
+            $normalizers = array($normalizer);
+            $serializer = new Serializer($normalizers, $encoders);
+            $text = "error, you did not send the right json, json must have: name or idjoueur or idtable or a combination of those";
+            $jsonContent = $serializer->serialize($text,'json');
+            $response->setContent($jsonContent);
+        }
+        return $response;
+    }
+
+    /**
+     * @Route("/api/deletepersonnage/{id}", name="deletepersonnageapi", methods={"DELETE"})
+     */
+    public function deletePersonngageAPI(Request $request, $id)
+    {
+        $per = $this->getDoctrine()
+                    ->getRepository(Personnage::class)
                     ->find($id);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($joueur);
+        $em->remove($per);
         $em->flush();
         $encoders = array( new JsonEncoder());
         $normalizer = new ObjectNormalizer();

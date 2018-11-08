@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
-use App\Form\JoueurType;
 use App\Entity\Joueur;
+use App\Entity\Personnage;
+use App\Entity\MyTable;
+use App\Form\MyTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,14 +15,15 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class JoueurControllerAPI extends AbstractController
+
+class MyTableControllerAPI extends AbstractController
 {
     /**
-     * @Route("/API/joueur/{id}", name="joueurapi", methods={"GET"})
+     * @Route("/api/table/{id}", name="tableAPI", methods={"GET"})
      */
-    public function joueurApi(Request $request, $id)
+    public function MytableAPI(Request $request, $id)
     {
-
+        
         $encoders = array( new JsonEncoder());
         $normalizer = new ObjectNormalizer();
         $normalizer->setCircularReferenceLimit(1);
@@ -30,30 +33,38 @@ class JoueurControllerAPI extends AbstractController
         });
         $normalizers = array($normalizer);
         $serializer = new Serializer($normalizers, $encoders);
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
+        $table = $this->getDoctrine()
+                    ->getRepository(Mytable::class)
                     ->find($id);
-        $jsonContent = $serializer->serialize($joueur,'json');
+        $jsonContent = $serializer->serialize($table,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
         return $response;
     }
     
     /**
-     * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST"})
+     * @Route("/api/newtable", name="newtableAPI", methods={"POST"})
      */
-    public function saveJoueurAPI(Request $request)
+    public function savetableAPI(Request $request)
     {
         $json = $request->getContent();
         $content = json_decode($json, true);
-        $joueur = new Joueur();
+        $table = new MyTable();
         $response = new JsonResponse();
         
-        if (isset($content["name"])){
+        if (isset($content["name"]) && isset($content["mj"]) && isset($content["description"]) && isset($content["idjoueurs"])){
 
-            $joueur->setName($content["name"]);
+            $table->setName($content["name"]);
+            $table->setMJ($content["mj"]);
+            $table->setDescription($content["description"]);
+            foreach ($content["idjoueurs"] as $idj){
+                $j = $this->getDoctrine()
+                    ->getRepository(Joueur::class)
+                    ->find($idj);
+                $table->addJoueur($j);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($joueur);
+            $em->persist($table);
             $em->flush();
             $encoders = array( new JsonEncoder());
             $normalizer = new ObjectNormalizer();
@@ -64,8 +75,7 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $text = "created";
-            $jsonContent = $serializer->serialize($joueur,'json');
+            $jsonContent = $serializer->serialize($table,'json');
             $response->setContent($jsonContent);
         }
 
@@ -79,31 +89,54 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name";
+            $text = "error, you did not send the right json, json must have: name, mj, description, idjoueur[id, id]";
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }
-        return $response; 
-    }    
-
-     
+        return $response;
+    }
+    
     /**
-     * @Route("/API/updatejoueur/{id}", name="updatejoueurAPI", methods={"PUT"})
+     * @Route("/api/updatemytable/{id}", name="updatemytableapi", methods={"PUT"})
      */
-    public function updatejoueurAPI(Request $request, $id)
+    public function updatePersonngageAPI(Request $request, $id)
     {
         $json = $request->getContent();
         $content = json_decode($json, true);
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
+        $table = $this->getDoctrine()
+                    ->getRepository(Mytable::class)
                     ->find($id);
         $response = new JsonResponse();
         
-        if (isset($content["name"])){
-
-            $joueur->setName($content["name"]);
+        if (isset($content["name"]) || isset($content["mj"]) || isset($content["description"]) || isset($content["idjoueurs"]) || isset($content["idpersos"])){
+            
+            if (isset($content["name"])){
+                $table->setName($content["name"]);
+            }
+            if (isset($content["mj"])){
+                $table->setMJ($content["mj"]);
+            }
+            if(isset($content["description"])){
+                $table->setDescription($content["description"]);
+            }
+            if(isset($content["idjoueurs"])){
+                foreach ($content["idjoueurs"] as $idj){
+                    $j = $this->getDoctrine()
+                        ->getRepository(Joueur::class)
+                        ->find($idj);
+                    $table->addJoueur($j);                
+                }
+            }
+            if (isset($content["idpersos"])){
+                foreach ($content["idpersos"] as $idp){
+                    $p = $this->getDoctrine()
+                        ->getRepository(Personnage::class)
+                        ->find($idp);
+                    $table->addPersonnage($p);                
+                }
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($joueur);
+            $em->persist($table);
             $em->flush();
             $encoders = array( new JsonEncoder());
             $normalizer = new ObjectNormalizer();
@@ -114,7 +147,7 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $jsonContent = $serializer->serialize($joueur,'json');
+            $jsonContent = $serializer->serialize($table,'json');
             $response->setContent($jsonContent);
         }
 
@@ -128,23 +161,23 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name";
+            $text = "error, you did not send the right json, json must have:name or mj or description or id joueurs or idpersos or a combination of those";
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }
-        return $response; 
+        return $response;
     }
 
     /**
-     * @Route("/api/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
+     * @Route("/api/deletemytable/{id}", name="deletemytableapi", methods={"DELETE"})
      */
-    public function deleteJoueurAPI(Request $request, $id)
+    public function deletePersonngageAPI(Request $request, $id)
     {
-        $joueur = $this->getDoctrine()
-                    ->getRepository(Joueur::class)
+        $table = $this->getDoctrine()
+                    ->getRepository(MyTable::class)
                     ->find($id);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($joueur);
+        $em->remove($table);
         $em->flush();
         $encoders = array( new JsonEncoder());
         $normalizer = new ObjectNormalizer();
@@ -161,4 +194,4 @@ class JoueurControllerAPI extends AbstractController
         $response->setContent($jsonContent);
         return $response;
     }
-} 
+}

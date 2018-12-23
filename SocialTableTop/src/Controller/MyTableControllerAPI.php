@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Serializer;
 class MyTableControllerAPI extends AbstractController
 {
     /**
-     * @Route("/api/table/{id}", name="tableAPI", methods={"GET"})
+     * @Route("/API/table/{id}", name="tableAPI", methods={"GET"})
      */
     public function MytableAPI(Request $request, $id)
     {
@@ -39,11 +39,38 @@ class MyTableControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($table,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
+    }
+
+    /**
+     * @Route("/API/tables", name="tablesAPI", methods={"GET"})
+     */
+    public function MytablesAPI(Request $request)
+    {        
+        $encoders = array( new JsonEncoder());
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setCircularReferenceLimit(1);
+        // Add Circular reference handler
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            return $object->getId();
+        });
+        $normalizers = array($normalizer);
+        $serializer = new Serializer($normalizers, $encoders);
+        $table = $this->getDoctrine()
+                    ->getRepository(Mytable::class)
+                    ->findAll();
+        $jsonContent = $serializer->serialize($table,'json');
+        $response = new JsonResponse();
+        $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
     
     /**
-     * @Route("/api/newtable", name="newtableAPI", methods={"POST"})
+     * @Route("/API/newtable", name="newtableAPI", methods={"POST"})
      */
     public function savetableAPI(Request $request)
     {
@@ -97,7 +124,7 @@ class MyTableControllerAPI extends AbstractController
     }
     
     /**
-     * @Route("/api/updatemytable/{id}", name="updatemytableapi", methods={"PUT"})
+     * @Route("/API/updatemytable/{id}", name="updatemytableapi", methods={"PUT"})
      */
     public function updatePersonngageAPI(Request $request, $id)
     {
@@ -169,7 +196,7 @@ class MyTableControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/api/deletemytable/{id}", name="deletemytableapi", methods={"DELETE"})
+     * @Route("/API/deletemytable/{id}", name="deletemytableapi", methods={"DELETE"})
      */
     public function deletePersonngageAPI(Request $request, $id)
     {

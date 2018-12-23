@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Serializer;
 class PersonnageControllerAPI extends AbstractController
 {
     /**
-     * @Route("/API/presonnage/{id}", name="personnageapi", methods={"GET"})
+     * @Route("/API/personnage/{id}", name="personnageapi", methods={"GET"})
      */
     public function personnageAPI(Request $request, $id)
     {

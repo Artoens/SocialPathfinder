@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Serializer;
 class PersonnageControllerAPI extends AbstractController
 {
     /**
-     * @Route("/api/presonnage/{id}", name="personnageapi", methods={"GET"})
+     * @Route("/API/presonnage/{id}", name="personnageapi", methods={"GET"})
      */
     public function personnageAPI(Request $request, $id)
     {
@@ -36,11 +36,39 @@ class PersonnageControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($personnage,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
+    }
+
+      /**
+     * @Route("/API/presonnages", name="personnagesapi", methods={"GET"})
+     */
+    
+    public function personnagesAPI(Request $request)
+    {
+        $encoders = array( new JsonEncoder());
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setCircularReferenceLimit(1);
+        // Add Circular reference handler
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            return $object->getId();
+        });
+        $normalizers = array($normalizer);
+        $serializer = new Serializer($normalizers, $encoders);
+        $personnage = $this->getDoctrine()
+                    ->getRepository(Personnage::class)
+                    ->findAll(); 
+        $jsonContent = $serializer->serialize($personnage,'json');
+        $response = new JsonResponse();
+        $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
     /**
-     * @Route("/api/newpersonnage", name="newpersonnageapi", methods={"POST"})
+     * @Route("/API/newpersonnage", name="newpersonnageapi", methods={"POST"})
      */
     public function savePersonngageAPI(Request $request)
     {
@@ -94,7 +122,7 @@ class PersonnageControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/api/updatepersonnage/{id}", name="updatepersonnageapi", methods={"PUT"})
+     * @Route("/API/updatepersonnage/{id}", name="updatepersonnageapi", methods={"PUT"})
      */
     public function updatePersonngageAPI(Request $request, $id)
     {
@@ -155,7 +183,7 @@ class PersonnageControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/api/deletepersonnage/{id}", name="deletepersonnageapi", methods={"DELETE"})
+     * @Route("/API/deletepersonnage/{id}", name="deletepersonnageapi", methods={"DELETE"})
      */
     public function deletePersonngageAPI(Request $request, $id)
     {

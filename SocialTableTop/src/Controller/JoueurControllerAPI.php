@@ -46,7 +46,6 @@ class JoueurControllerAPI extends AbstractController
      */
     public function joueursApi(Request $request)
     {
-
         $encoders = array( new JsonEncoder());
         $normalizer = new ObjectNormalizer();
         $normalizer->setCircularReferenceLimit(1);
@@ -62,6 +61,8 @@ class JoueurControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($joueurs,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
@@ -165,10 +166,12 @@ class JoueurControllerAPI extends AbstractController
     }
 
     /**
+     * error present beacause of dependenciess
      * @Route("/API/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
      */
     public function deleteJoueurAPI(Request $request, $id)
     {
+        $response = new Response();
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
                     ->find($id);
@@ -188,6 +191,10 @@ class JoueurControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($text,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
         return $response;
     }
 } 

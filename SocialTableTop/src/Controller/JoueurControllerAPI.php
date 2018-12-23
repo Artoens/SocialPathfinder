@@ -36,8 +36,36 @@ class JoueurControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($joueur,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
+
+     /**
+     * @Route("/API/joueurs", name="joueursapi", methods={"GET"})
+     */
+    public function joueursApi(Request $request)
+    {
+
+        $encoders = array( new JsonEncoder());
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setCircularReferenceLimit(1);
+        // Add Circular reference handler
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            return $object->getId();
+        });
+        $normalizers = array($normalizer);
+        $serializer = new Serializer($normalizers, $encoders);
+        $joueurs = $this->getDoctrine()
+            ->getRepository(Joueur::class)
+            ->findAll(); 
+        $jsonContent = $serializer->serialize($joueurs,'json');
+        $response = new JsonResponse();
+        $response->setContent($jsonContent);
+        return $response;
+    }
+
+    
     
     /**
      * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST"})
@@ -83,7 +111,8 @@ class JoueurControllerAPI extends AbstractController
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }
-        return $response; 
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }    
 
      
@@ -136,7 +165,7 @@ class JoueurControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/api/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
+     * @Route("/API/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
      */
     public function deleteJoueurAPI(Request $request, $id)
     {

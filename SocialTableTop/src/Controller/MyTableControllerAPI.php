@@ -70,7 +70,7 @@ class MyTableControllerAPI extends AbstractController
     }
     
     /**
-     * @Route("/API/ ", name="newtableAPI", methods={"POST", "OPTIONS"})
+     * @Route("/API/newtable ", name="newtableAPI", methods={"POST", "OPTIONS"})
      */
     public function savetableAPI(Request $request)
     {

@@ -70,15 +70,23 @@ class MyTableControllerAPI extends AbstractController
     }
     
     /**
-     * @Route("/API/newtable", name="newtableAPI", methods={"POST"})
+     * @Route("/API/ ", name="newtableAPI", methods={"POST", "OPTIONS"})
      */
     public function savetableAPI(Request $request)
     {
+        $response = new Response();
+        $query = array();
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type', true);
+            return $response;
+        }
         $json = $request->getContent();
         $content = json_decode($json, true);
-        $table = new MyTable();
-        $response = new JsonResponse();
-        
+        $table = new MyTable();        
         if (isset($content["name"]) && isset($content["mj"]) && isset($content["description"]) && isset($content["idjoueurs"])){
 
             $table->setName($content["name"]);
@@ -93,33 +101,18 @@ class MyTableControllerAPI extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($table);
             $em->flush();
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $jsonContent = $serializer->serialize($table,'json');
-            $response->setContent($jsonContent);
+            $query['valid'] = true; 
+            $query['data'] = array('name' => $content["name"]);
+            $response->setStatusCode('201');
         }
 
         else{
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name, mj, description, idjoueur[id, id]";
-            $jsonContent = $serializer->serialize($text,'json');
-            $response->setContent($jsonContent);
-        }
+            $query['valid'] = false; 
+            $query['data'] = null;
+            $response->setStatusCode('404');
+        }        
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setContent(json_encode($query));
         return $response;
     }
     
@@ -196,10 +189,21 @@ class MyTableControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/API/deletemytable/{id}", name="deletemytableapi", methods={"DELETE"})
+     * @Route("/API/deletemytable/{id}", name="deletemytableapi", methods={"DELETE", "OPTIONS"})
      */
     public function deletePersonngageAPI(Request $request, $id)
     {
+        $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
+
         $table = $this->getDoctrine()
                     ->getRepository(MyTable::class)
                     ->find($id);

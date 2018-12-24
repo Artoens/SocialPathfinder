@@ -68,14 +68,23 @@ class PersonnageControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/API/newpersonnage", name="newpersonnageapi", methods={"POST"})
+     * @Route("/API/newpersonnage", name="newpersonnageapi", methods={"POST", "OPTIONS"})
      */
     public function savePersonngageAPI(Request $request)
     {
+        $response = new Response();
+        $query = array();
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type', true);
+            return $response;
+        }
         $json = $request->getContent();
         $content = json_decode($json, true);
         $perso = new Personnage();
-        $response = new JsonResponse();
         
         if (isset($content["name"]) && isset($content["idjoueur"])&& isset($content["idtable"])){
 
@@ -91,33 +100,18 @@ class PersonnageControllerAPI extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($perso);
             $em->flush();
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $jsonContent = $serializer->serialize($perso,'json');
-            $response->setContent($jsonContent);
+            $query['valid'] = true; 
+            $query['data'] = array('name' => $content["name"]);
+            $response->setStatusCode('201');        
         }
-
-        else{
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name, idjoueur and idtable";
-            $jsonContent = $serializer->serialize($text,'json');
-            $response->setContent($jsonContent);
-        }
+        else 
+        {
+            $query['valid'] = false; 
+            $query['data'] = null;
+            $response->setStatusCode('404');
+        }        
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setContent(json_encode($query));
         return $response;
     }
 
@@ -183,10 +177,21 @@ class PersonnageControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/API/deletepersonnage/{id}", name="deletepersonnageapi", methods={"DELETE"})
+     * @Route("/API/deletepersonnage/{id}", name="deletepersonnageapi", methods={"DELETE", "OPTIONS"})
      */
     public function deletePersonngageAPI(Request $request, $id)
     {
+        $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
+
         $per = $this->getDoctrine()
                     ->getRepository(Personnage::class)
                     ->find($id);

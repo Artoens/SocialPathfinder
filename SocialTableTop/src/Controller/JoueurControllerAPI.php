@@ -68,53 +68,46 @@ class JoueurControllerAPI extends AbstractController
 
     
     
-    /**
-     * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST"})
+  /**
+     * @Route("/API/newjoueur", name="newjoueurAPI", methods={"POST", "OPTIONS"})
      */
     public function saveJoueurAPI(Request $request)
     {
+        $response = new Response();
+        $query = array();
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type', true);
+            return $response;
+        }
         $json = $request->getContent();
         $content = json_decode($json, true);
-        $joueur = new Joueur();
-        $response = new JsonResponse();
-        
-        if (isset($content["name"])){
-
-            $joueur->setName($content["name"]);
+        if (isset($content["name"]))
+        {
+            $joueur = new Joueur();
+            $joueur->setTitle($content["name"]);
             $em = $this->getDoctrine()->getManager();
             $em->persist($joueur);
             $em->flush();
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $text = "created";
-            $jsonContent = $serializer->serialize($joueur,'json');
-            $response->setContent($jsonContent);
+            
+            $query['valid'] = true; 
+            $query['data'] = array('name' => $content["name"]);
+            $response->setStatusCode('201');
         }
-
-        else{
-            $encoders = array( new JsonEncoder());
-            $normalizer = new ObjectNormalizer();
-            $normalizer->setCircularReferenceLimit(1);
-            // Add Circular reference handler
-            $normalizer->setCircularReferenceHandler(function ($object) {
-                return $object->getId();
-            });
-            $normalizers = array($normalizer);
-            $serializer = new Serializer($normalizers, $encoders);
-            $text = "error, you did not send the right json, json must have: name";
-            $jsonContent = $serializer->serialize($text,'json');
-            $response->setContent($jsonContent);
-        }
+        else 
+        {
+            $query['valid'] = false; 
+            $query['data'] = null;
+            $response->setStatusCode('404');
+        }        
         $response->headers->set('Content-Type', 'application/json');
+        $response->setContent(json_encode($query));
         return $response;
-    }    
+    }
+  
 
      
     /**
@@ -166,12 +159,21 @@ class JoueurControllerAPI extends AbstractController
     }
 
     /**
-     * error present beacause of dependenciess
-     * @Route("/API/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE"})
+     * @Route("/API/deletejoueur/{id}", name="apideletejoueur", methods={"DELETE", "OPTIONS"})
      */
     public function deleteJoueurAPI(Request $request, $id)
     {
         $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
+
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
                     ->find($id);
@@ -191,10 +193,6 @@ class JoueurControllerAPI extends AbstractController
         $jsonContent = $serializer->serialize($text,'json');
         $response = new JsonResponse();
         $response->setContent($jsonContent);
-        $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
         return $response;
     }
 } 

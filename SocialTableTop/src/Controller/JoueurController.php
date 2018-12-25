@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class JoueurController extends AbstractController
 {
     /**
+     * show one specific player
      * @Route("/joueur/{id}", name="joueur")
      */
     public function joueur(Request $request, $id)
@@ -26,6 +27,7 @@ class JoueurController extends AbstractController
     }
 
     /**
+     * create a new player
      * @Route("/newjoueur", name="newjoueur")
      */
     public function saveJoueur(Request $request)
@@ -51,6 +53,7 @@ class JoueurController extends AbstractController
     }    
      
     /**
+     * update a player
      * @Route("/updatejoueur/{id}", name="updatejoueur")
      */
     public function updatejoueur(Request $request, $id)
@@ -78,6 +81,7 @@ class JoueurController extends AbstractController
     }
 
     /**
+     * delete a player
      * @Route("/deletejoueur/{id}", name="deletejoueur")
      */
     public function deleteJoueur(Request $request, $id)

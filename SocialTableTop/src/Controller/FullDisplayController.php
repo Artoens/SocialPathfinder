@@ -8,6 +8,7 @@ use App\Entity\Joueur;
 use App\Entity\Personnage;
 use App\Entity\MyTable;
 
+//class that takes care of displaying everything
 class FullDisplayController extends AbstractController
 {
     /**

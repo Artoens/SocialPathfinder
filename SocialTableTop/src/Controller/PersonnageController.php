@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class PersonnageController extends AbstractController
 {
     /**
+     * acces a specific perso
      * @Route("/presonnage/{id}", name="personnage")
      */
     public function personnage(Request $request, $id)
@@ -27,6 +28,7 @@ class PersonnageController extends AbstractController
     }
 
     /**
+     * new perso
      * @Route("/newpersonnage", name="newpersonnage")
      */
     public function savePersonngage(Request $request)
@@ -52,6 +54,7 @@ class PersonnageController extends AbstractController
     }
 
     /**
+     * update a perso
      * @Route("/updatepersonnage/{id}", name="updatepersonnage")
      */
     public function updatePersonngage(Request $request, $id)
@@ -79,6 +82,7 @@ class PersonnageController extends AbstractController
     }
 
     /**
+     * delete a perso
      * @Route("/deletepersonnage/{id}", name="deletepersonnage")
      */
     public function deletePersonngage(Request $request, $id)

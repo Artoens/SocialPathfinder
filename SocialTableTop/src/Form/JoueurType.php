@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
+//form for the creationg and update of joueur
 class JoueurType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

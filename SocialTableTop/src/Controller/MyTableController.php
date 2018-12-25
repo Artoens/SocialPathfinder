@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class MyTableController extends AbstractController
 {
     /**
+     * acces a specific table
      * @Route("/table/{id}", name="table")
      */
     public function Mytable(Request $request, $id)
@@ -28,6 +29,7 @@ class MyTableController extends AbstractController
     }
     
     /**
+     * create a new table
      * @Route("/newtable", name="newtable")
      */
     public function savetable(Request $request)
@@ -53,6 +55,7 @@ class MyTableController extends AbstractController
     }
     
     /**
+     * update a table
      * @Route("/updatemytable/{id}", name="updatemytable")
      */
     public function updatePersonngage(Request $request, $id)
@@ -80,6 +83,7 @@ class MyTableController extends AbstractController
     }
 
     /**
+     * delete a table
      * @Route("/deletemytable/{id}", name="deletemytable")
      */
     public function deletePersonngage(Request $request, $id)

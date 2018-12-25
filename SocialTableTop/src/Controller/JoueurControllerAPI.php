@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
+//class that does what joueurcontroller does but as an API
 class JoueurControllerAPI extends AbstractController
 {
     /**

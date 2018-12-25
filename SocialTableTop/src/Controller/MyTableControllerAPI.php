@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-
+//class that does what Mytablecontroller does but as an API
 class MyTableControllerAPI extends AbstractController
 {
     /**

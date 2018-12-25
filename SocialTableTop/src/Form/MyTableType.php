@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
+//form for the creationg and update of table
 class MyTableType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

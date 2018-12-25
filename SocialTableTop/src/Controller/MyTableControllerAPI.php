@@ -117,16 +117,26 @@ class MyTableControllerAPI extends AbstractController
     }
     
     /**
-     * @Route("/API/updatemytable/{id}", name="updatemytableapi", methods={"PUT"})
+     * @Route("/API/updatemytable/{id}", name="updatemytableapi", methods={"PUT", "OPTIONS"})
      */
     public function updatePersonngageAPI(Request $request, $id)
     {
+        $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
+
         $json = $request->getContent();
         $content = json_decode($json, true);
         $table = $this->getDoctrine()
                     ->getRepository(Mytable::class)
                     ->find($id);
-        $response = new JsonResponse();
         
         if (isset($content["name"]) || isset($content["mj"]) || isset($content["description"]) || isset($content["idjoueurs"]) || isset($content["idpersos"])){
             
@@ -167,6 +177,7 @@ class MyTableControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
+            $response->headers->set('Content-Type', 'application/json');
             $jsonContent = $serializer->serialize($table,'json');
             $response->setContent($jsonContent);
         }
@@ -183,6 +194,7 @@ class MyTableControllerAPI extends AbstractController
             $serializer = new Serializer($normalizers, $encoders);
             $text = "error, you did not send the right json, json must have:name or mj or description or id joueurs or idpersos or a combination of those";
             $jsonContent = $serializer->serialize($text,'json');
+            $response->headers->set('Content-Type', 'application/json');
             $response->setContent($jsonContent);
         }
         return $response;

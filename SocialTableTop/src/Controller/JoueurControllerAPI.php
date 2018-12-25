@@ -111,16 +111,25 @@ class JoueurControllerAPI extends AbstractController
 
      
     /**
-     * @Route("/API/updatejoueur/{id}", name="updatejoueurAPI", methods={"PUT"})
+     * @Route("/API/updatejoueur/{id}", name="updatejoueurAPI", methods={"PUT", "OPTIONS"})
      */
     public function updatejoueurAPI(Request $request, $id)
     {
+        $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
         $json = $request->getContent();
         $content = json_decode($json, true);
         $joueur = $this->getDoctrine()
                     ->getRepository(Joueur::class)
                     ->find($id);
-        $response = new JsonResponse();
         
         if (isset($content["name"])){
 
@@ -137,6 +146,7 @@ class JoueurControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
+            $response->headers->set('Content-Type', 'application/json');
             $jsonContent = $serializer->serialize($joueur,'json');
             $response->setContent($jsonContent);
         }
@@ -152,6 +162,7 @@ class JoueurControllerAPI extends AbstractController
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
             $text = "error, you did not send the right json, json must have: name";
+            $response->headers->set('Content-Type', 'application/json');
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }

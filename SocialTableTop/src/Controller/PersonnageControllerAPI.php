@@ -116,16 +116,26 @@ class PersonnageControllerAPI extends AbstractController
     }
 
     /**
-     * @Route("/API/updatepersonnage/{id}", name="updatepersonnageapi", methods={"PUT"})
+     * @Route("/API/updatepersonnage/{id}", name="updatepersonnageapi", methods={"PUT", "OPTIONS"})
      */
     public function updatePersonngageAPI(Request $request, $id)
     {
+        $response = new Response();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+        {
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type',true);
+            return $response;
+        }
         $json = $request->getContent();
         $content = json_decode($json, true);
         $perso = $this->getDoctrine()
                     ->getRepository(Personnage::class)
                     ->find($id);
-        $response = new JsonResponse();
+     
         
         if (isset($content["name"]) || isset($content["idjoueur"])|| isset($content["idtable"])){
             if(isset($content["name"])){
@@ -155,6 +165,7 @@ class PersonnageControllerAPI extends AbstractController
             });
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
+            $response->headers->set('Content-Type', 'application/json');
             $jsonContent = $serializer->serialize($perso,'json');
             $response->setContent($jsonContent);
         }
@@ -170,6 +181,7 @@ class PersonnageControllerAPI extends AbstractController
             $normalizers = array($normalizer);
             $serializer = new Serializer($normalizers, $encoders);
             $text = "error, you did not send the right json, json must have: name or idjoueur or idtable or a combination of those";
+            $response->headers->set('Content-Type', 'application/json');
             $jsonContent = $serializer->serialize($text,'json');
             $response->setContent($jsonContent);
         }
